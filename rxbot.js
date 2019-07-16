@@ -1,6 +1,7 @@
 var TigerConnect = require('tigerconnect')
 var httplib = require("./httpLib")
 
+const botId = "perscriptionbot@tigerconnect.com";
 var client = new TigerConnect.Client({
     baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
     defaultOrganizationId: 'HP8FBxTpDl5AWanDFc3AY4Pe', // use the default org to send all messages in a specific organization unless specified otherwise
@@ -24,41 +25,122 @@ function onSignedIn(session) {
   console.log('Signed in as', session.user.displayName)
 
   client.messages.sendToUser(
-    'cliang@tigerconnect.com',
+    botId,
     'Hello! I am the RxBot.'
   ).then(function (message) {
     const disclaimer = "This product uses publicly available data from the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product.";
     client.messages.sendToUser(
-      'cliang@tigerconnect.com',
+      botId,
       disclaimer
     ).then(function (message) {
         client.messages.sendToUser(
-            'cliang@tigerconnect.com',
-            'Enter the name of drug you want information about.'
+            botId,
+            'Enter "\\help" to get the list of available commands'
           ).then(function (message) {
-            console.log('sent', message.body, 'to', message.recipient.displayName)
+            client.messages.sendToUser(
+                botId,
+                'Enter the name of the drug you want information about, in the format "\\drug amoxicillin"'
+              ).then(function (message) {
+                console.log('sent', message.body, 'to', message.recipient.displayName)
+              })
           })
     })
   })
 
   client.events.connect()
 
+  var drugTypes = []
+  var drugStrength = []
+  var rxcuis = []
+  var drugName = ""
+  var drugNum = ""
+  var drugId = ""
+
   client.on('message', function (message) {
-    const drugName = message.body
-    console.log(drugName);
-    // Get RxNorm ID
-    httplib.getRequest("https://rxnav.nlm.nih.gov/REST/rxcui?name=" + drugName, (rxNormResp) => {
-        console.log(rxNormResp)
-        const rxcui = rxNormResp.rxnormdata.idGroup[0].rxnormId
-        console.log(rxcui)
-        
-        
-        
-        
-    });
+    const msgBody = message.body;
+    const splitIndex = msgBody.indexOf(" ")
+    const command = msgBody.substr(0, splitIndex)
+    const remMsg = msgBody.substr(splitIndex + 1)
 
+    if(command == "\\drug")
+    {
+        drugName = remMsg
+        console.log(drugName);
+        // Get RxNorm ID
+        httplib.getRequestJson("https://clin-table-search.lhc.nlm.nih.gov/api/rxterms/v3/search?ef=STRENGTHS_AND_FORMS,RXCUIS&authenticity_token=&terms=" + drugName, (rxNormResp) => {
+            console.log(rxNormResp)
+            //TODO: Note an array rxcui is returned. Handle this at a later point
+            console.log(rxNormResp[0]);
+            drugTypes = rxNormResp[1];
+            console.log(drugTypes);
+            drugStrength = rxNormResp[2].STRENGTHS_AND_FORMS;
+            console.log(drugStrength)
+            rxcuis = rxNormResp[2].RXCUIS;
+            console.log(rxcuis)
     
+            var i = 0;
+            var drugTypeMsg = "Variants available are:\n\n";
+            for(i = 0; i< drugTypes.length; i++)
+            {
+                drugTypeMsg += (i+1) + ".  " + drugTypes[i] + "\n";
+            }
+    
+            console.log(drugTypeMsg);
+    
+            client.messages.sendToUser(
+                botId,
+                drugTypeMsg
+              ).then(function (message) {
+                client.messages.sendToUser(
+                    botId,
+                    'Enter the variant number of the drug in the format "\\str 1" to get dosage and strength information.'
+                  ).then(function (message) {
+                    console.log('sent', message.body, 'to', message.recipient.displayName)
+                  })
+              })
+        });   
+    }
+    else if(command == "\\str")
+    {
+        drugNum = remMsg;
+        console.log(drugNum);
+        var drugstr = "Strengths and Dosages available are:\n\n";
+        console.log(drugStrength);
+        var drugSelected = drugStrength[drugNum - 1];
+        var j = 0;
+        for(j = 0; j< drugSelected.length; j++)
+        {
+            drugstr +=  (j+1) + ".  " + drugSelected[j] + "\n";
+        }
+        console.log(drugstr);
 
+        client.messages.sendToUser(
+          botId,
+          drugstr
+        ).then(function (message) {
+          client.messages.sendToUser(
+              botId,
+              'Enter the number of the drug in the format "\\more 1" to get more information'
+            ).then(function (message) {
+              console.log('sent', message.body, 'to', message.recipient.displayName)
+            })
+        })
+    }
+    else if(command == "\\more")
+    {
+        drugId = remMsg;
+        console.log(drugId);
+        console.log(rxcuis);
+        const allInfoReq = "https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/"+ rxcuis[drugNum - 1][drugId - 1] +"/allinfo";
+        httplib.getRequestXML(allInfoReq, (allInfoResp) => {
+            console.dir(allInfoResp);
+        })
+
+    }
+    else if(command == "")
+    {
+
+    }
 
   })
 }
