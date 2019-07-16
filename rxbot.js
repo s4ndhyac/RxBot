@@ -71,33 +71,59 @@ function onSignedIn(session) {
         httplib.getRequestJson("https://clin-table-search.lhc.nlm.nih.gov/api/rxterms/v3/search?ef=STRENGTHS_AND_FORMS,RXCUIS&authenticity_token=&terms=" + drugName, (rxNormResp) => {
             console.log(rxNormResp)
             console.log(rxNormResp[0]);
-            drugTypes = rxNormResp[1];
-            console.log(drugTypes);
-            drugStrength = rxNormResp[2].STRENGTHS_AND_FORMS;
-            console.log(drugStrength)
-            rxcuis = rxNormResp[2].RXCUIS;
-            console.log(rxcuis)
-
-            var i = 0;
-            var drugTypeMsg = "Variants available are:\n\n";
-            for(i = 0; i< drugTypes.length; i++)
+            if(rxNormResp[0] == 0)
             {
-                drugTypeMsg += (i+1) + ".  " + drugTypes[i] + "\n";
-            }
+              httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/spellingsuggestions.json?name=" + drugName, (approxResp) => {
+                console.log(approxResp);
+                approxDrugs = approxResp.suggestionGroup.suggestionList.suggestion;
+                console.log(approxDrugs)
+                var k = 0;
+                var suggestions = "Did you mean:\n\n";
+                for(k = 0; k< approxDrugs.length; k++)
+                {
+                  suggestions += approxDrugs[k] + "\n";
+                }
 
-            console.log(drugTypeMsg);
-
-            client.messages.sendToUser(
-                botId,
-                drugTypeMsg
-              ).then(function (message) {
+                suggestions += '\nPlease type in the command in the format "\\drug amoxicillin" again.';
+                
                 client.messages.sendToUser(
-                    botId,
-                    'Enter the variant number of the drug in the format "\\str 1" to get dosage and strength information.'
-                  ).then(function (message) {
-                    console.log('sent', message.body, 'to', message.recipient.displayName)
-                  })
+                  botId,
+                  suggestions
+                ).then(function (message) {
+                  console.log('sent', message.body, 'to', message.recipient.displayName)
+                })
+
               })
+            }
+            else
+            {
+              drugTypes = rxNormResp[1];
+              console.log(drugTypes);
+              drugStrength = rxNormResp[2].STRENGTHS_AND_FORMS;
+              console.log(drugStrength)
+              rxcuis = rxNormResp[2].RXCUIS;
+              console.log(rxcuis)
+  
+              var i = 0;
+              var drugTypeMsg = "Variants available are:\n\n";
+              for(i = 0; i< drugTypes.length; i++)
+              {
+                  drugTypeMsg += (i+1) + ".  " + drugTypes[i] + "\n";
+              }
+  
+              console.log(drugTypeMsg);
+              client.messages.sendToUser(
+                  botId,
+                  drugTypeMsg
+                ).then(function (message) {
+                  client.messages.sendToUser(
+                      botId,
+                      'Enter the variant number of the drug in the format "\\str 1" to get dosage and strength information.'
+                    ).then(function (message) {
+                      console.log('sent', message.body, 'to', message.recipient.displayName)
+                    })
+                })
+            }
         });
     }
     else if(command == "\\str")
