@@ -190,7 +190,7 @@ function onSignedIn(session) {
             ).then(function (message) {
               client.messages.sendToUser(
                   botId,
-                  'Enter "\\inter yes" to get information about any drug-drug interactions. Enter "\\inter no" to end interaction.'
+                  'Enter "\\inter yes" to get information about any high priority drug-drug interactions. Enter "\\inter no" to end interaction.'
                 ).then(function (message) {
                   console.log('sent', message.body, 'to', message.recipient.displayName)
                 })
@@ -204,24 +204,30 @@ function onSignedIn(session) {
       {
         var interactionsInfo = ""
         httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
+            if (!interactionsList) {
+              client.messages.sendToUser(
+                botId,
+                "No interactions found."
+              )
+            } else {
             var interactionsList = interactionsResp.interactionTypeGroup[0].interactionType[0].interactionPair
             {
               var k = 0;
               var name = "";
-              var severity = "";
               for(k = 0; k < interactionsList.length; k++)
               {
                 name = interactionsList[k].interactionConcept[1].minConceptItem.name
                 severity = interactionsList[k].severity
                 description = interactionsList[k].description
-                interactionsInfo += (k + 1) + ".  " + name + ", " + severity + "\n[" + description + "]" + "\n";
+                interactionsInfo += (k + 1) + ".  " + name + ", " + "\n[" + description + "]" + "\n";
               }
             }
             console.log(interactionsInfo)
             client.messages.sendToUser(
               botId,
-              "Below are the names of the interacting drugs, the level of interaction, and the type of interaction.\n\n" + interactionsInfo
+              "Below are the names of the interacting drugs and the type of interaction.\n\n" + interactionsInfo
             )
+          }
           })
       }
       else if(interResp == "no")
