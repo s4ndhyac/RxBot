@@ -2,9 +2,9 @@ var TigerConnect = require('tigerconnect')
 var rxbot = require('./rxbotClient');
 
 var client = new TigerConnect.Client({
-    baseUrl: 'https://env5-devapi.tigertext.xyz/v2',
+    baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
     // baseUrl: 'https://developer.tigertext.me/v2',
-    defaultOrganizationId: '3D5qqmf6f6RgVzFwcbZoIPuW', // use the default org to send all messages in a specific organization unless specified otherwise
+    defaultOrganizationId: 'HP8FBxTpDl5AWanDFc3AY4Pe', // use the default org to send all messages in a specific organization unless specified otherwise
     events: {
       autoAck: false,
       isTyping: true,
@@ -17,7 +17,7 @@ var client = new TigerConnect.Client({
     logLevel: 'error', // debug/info/warn/error/fatal
   })
 
-client.signIn('schandramohan@tigerconnect.com', 'oUALi3aRmS0\'', { udid: 'unique-device-id' }).then(function (session) {
+client.signIn('schandramohan@tigerconnect.com', 'Password!1', { udid: 'unique-device-id' }).then(function (session) {
   onSignedIn(session)
 })
 
@@ -26,7 +26,7 @@ function onSignedIn(session) {
 
   client.messages.sendToUser(
     'cliang@tigerconnect.com',
-    'hello!'
+    'hello3!'
   ).then(function (message) {
     console.log('sent', message.body, 'to', message.recipient.displayName)
   })
