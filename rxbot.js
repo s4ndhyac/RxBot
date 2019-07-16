@@ -144,6 +144,7 @@ function onSignedIn(session) {
             else if(brandNames.length > 0)
             {
               var k = 0;
+              moreInfo += "The brand names for the drug are:\n"
               for(k = 0; k< brandNames.length; k++)
               {
                 moreInfo += (k+1) + ".  " + brandNames[k] + "\n";
