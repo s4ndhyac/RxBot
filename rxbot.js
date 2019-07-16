@@ -170,11 +170,28 @@ function onSignedIn(session) {
     }
     else if(command == "\\inter")
     {
-
+      var interResp = remMsg;
+      if(interResp == "yes")
+      {
+        //TODO: Write code for drug-drug interaction
+      }
+      else if(interResp == "no")
+      {
+        client.messages.sendToUser(
+          botId,
+          'Enter the name of the drug you want information about, in the format "\\drug amoxicillin"'
+        ).then(function (message) {
+          console.log('sent', message.body, 'to', message.recipient.displayName)
+        })
+      }
     }
-    else if(command == "\\help")
+    else if(command == "\\help" || msgBody == "\\help")
     {
-      var help = ""
+      var help = "Commands:\n\n";
+      help += "1.  \\drug drugName - Variants of the drug available.\nFor example: \\drug amoxicillin \n\n";
+      help += "2.  \\str drugNumber - Strength and Dosage Information.\nFor example: \\str 1 \n\n";
+      help += "3.  \\more drugNumber - Information about branded and generic version.\nFor example: \\more 1 \n\n";
+      help += "4.  \\inter yes/no - Drug-Drug interaction.\nFor example: \\inter yes";
 
       client.messages.sendToUser(
         botId,
@@ -187,7 +204,7 @@ function onSignedIn(session) {
 
     const askInteraction = "What drug do you want to check for interactions with?"
     client.messages.sendToUser(
-        'cliang@tigerconnect.com',
+        botId,
         askInteraction
       ).then(function (message) {
         console.log('sent', message.body, 'to', message.recipient.displayName)
