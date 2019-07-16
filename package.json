@@ -1,0 +1,23 @@
+{
+  "name": "rxbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "rxbot.js",
+  "dependencies": {
+    "tigerconnect": "^3.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s4ndhyac/RxBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/s4ndhyac/RxBot/issues"
+  },
+  "homepage": "https://github.com/s4ndhyac/RxBot#readme"
+}
