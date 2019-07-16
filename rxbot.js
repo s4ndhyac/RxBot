@@ -203,8 +203,9 @@ function onSignedIn(session) {
       if(interResp == "yes")
       {
         var interactionsInfo = ""
-        httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
-            if (!interactionsList) {
+        var interactionsRequest = "https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh"
+        httplib.getRequestJson(interactionsRequest, (interactionsResp) => {
+            if (!interactionsResp.hasOwnProperty("interactionTypeGroup")) {
               client.messages.sendToUser(
                 botId,
                 "No interactions found."
