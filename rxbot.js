@@ -69,7 +69,6 @@ function onSignedIn(session) {
         // Get RxNorm ID
         httplib.getRequestJson("https://clin-table-search.lhc.nlm.nih.gov/api/rxterms/v3/search?ef=STRENGTHS_AND_FORMS,RXCUIS&authenticity_token=&terms=" + drugName, (rxNormResp) => {
             console.log(rxNormResp)
-            //TODO: Note an array rxcui is returned. Handle this at a later point
             console.log(rxNormResp[0]);
             drugTypes = rxNormResp[1];
             console.log(drugTypes);
@@ -131,17 +130,59 @@ function onSignedIn(session) {
         drugId = remMsg;
         console.log(drugId);
         console.log(rxcuis);
-        const allInfoReq = "https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/"+ rxcuis[drugNum - 1][drugId - 1] +"/allinfo";
+        var allInfoReq = "https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/"+ rxcuis[drugNum - 1][drugId - 1] +"/allinfo";
+        console.log(allInfoReq)
+        var moreInfo = "";
         httplib.getRequestXML(allInfoReq, (allInfoResp) => {
-            console.dir(allInfoResp);
-        })
+            var rxTerm = allInfoResp.rxtermsdata.rxtermsProperties[0]
+            console.dir(rxTerm);
+            const brandNames = rxTerm.brandName
+            if(brandNames.length == 1 && brandNames[0] == '')
+              moreInfo += "This drug doesn't have a branded version.\n";
+            else if(brandNames.length > 0)
+            {
+              var k = 0;
+              for(k = 0; k< brandNames.length; k++)
+              {
+                moreInfo += (k+1) + ".  " + brandNames[k] + "\n";
+              }
+              moreInfo += "\n";  
+            }
 
+            var genericName = rxTerm.fullGenericName;
+            if(genericName == "")
+              moreInfo += "This drug doesn't have a generic version.\n"
+            else
+              moreInfo += "The full generic name of the drug is "  + genericName + "\n";
+
+            client.messages.sendToUser(
+              botId,
+              moreInfo
+            ).then(function (message) {
+              client.messages.sendToUser(
+                  botId,
+                  'Enter "\\inter yes" to get information about any drug-drug interactions. Enter "\\inter no" to end interaction.'
+                ).then(function (message) {
+                  console.log('sent', message.body, 'to', message.recipient.displayName)
+                })
+            })
+        })
     }
-    else if(command == "")
+    else if(command == "\\inter")
     {
 
     }
+    else if(command == "\\help")
+    {
+      var help = ""
 
+      client.messages.sendToUser(
+        botId,
+        help
+      ).then(function (message) {
+        console.log('sent', message.body, 'to', message.recipient.displayName)
+      })
+    }
   })
 
     const askInteraction = "What drug do you want to check for interactions with?"
