@@ -175,11 +175,6 @@ function onSignedIn(session) {
       var interResp = remMsg;
       if(interResp == "yes")
       {
-        // console.log("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh")
-        // httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
-        //     console.log(interactionsResp)
-        //   })
-
         var interactionsInfo = ""
         httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
             var interactionsList = interactionsResp.interactionTypeGroup[0].interactionType[0].interactionPair
