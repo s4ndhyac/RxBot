@@ -1,5 +1,4 @@
 var TigerConnect = require('tigerconnect')
-var rxbot = require('./rxbotClient');
 
 var client = new TigerConnect.Client({
     baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
