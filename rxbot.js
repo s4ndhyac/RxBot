@@ -52,6 +52,7 @@ function onSignedIn(session) {
   var drugTypes = []
   var drugStrength = []
   var rxcuis = []
+  var rxcui = ""
   var drugName = ""
   var drugNum = ""
   var drugId = ""
@@ -76,16 +77,16 @@ function onSignedIn(session) {
             console.log(drugStrength)
             rxcuis = rxNormResp[2].RXCUIS;
             console.log(rxcuis)
-    
+
             var i = 0;
             var drugTypeMsg = "Variants available are:\n\n";
             for(i = 0; i< drugTypes.length; i++)
             {
                 drugTypeMsg += (i+1) + ".  " + drugTypes[i] + "\n";
             }
-    
+
             console.log(drugTypeMsg);
-    
+
             client.messages.sendToUser(
                 botId,
                 drugTypeMsg
@@ -97,7 +98,7 @@ function onSignedIn(session) {
                     console.log('sent', message.body, 'to', message.recipient.displayName)
                   })
               })
-        });   
+        });
     }
     else if(command == "\\str")
     {
@@ -130,6 +131,7 @@ function onSignedIn(session) {
         drugId = remMsg;
         console.log(drugId);
         console.log(rxcuis);
+        rxcui = rxcuis[drugNum - 1][drugId - 1]
         var allInfoReq = "https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/"+ rxcuis[drugNum - 1][drugId - 1] +"/allinfo";
         console.log(allInfoReq)
         var moreInfo = "";
@@ -146,7 +148,7 @@ function onSignedIn(session) {
               {
                 moreInfo += (k+1) + ".  " + brandNames[k] + "\n";
               }
-              moreInfo += "\n";  
+              moreInfo += "\n";
             }
 
             var genericName = rxTerm.fullGenericName;
@@ -173,7 +175,32 @@ function onSignedIn(session) {
       var interResp = remMsg;
       if(interResp == "yes")
       {
-        //TODO: Write code for drug-drug interaction
+        // console.log("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh")
+        // httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
+        //     console.log(interactionsResp)
+        //   })
+
+        var interactionsInfo = ""
+        httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh", (interactionsResp) => {
+            var interactionsList = interactionsResp.interactionTypeGroup[0].interactionType[0].interactionPair
+            {
+              var k = 0;
+              var name = "";
+              var severity = "";
+              for(k = 0; k < interactionsList.length; k++)
+              {
+                name = interactionsList[k].interactionConcept[1].minConceptItem.name
+                severity = interactionsList[k].severity
+                description = interactionsList[k].description
+                interactionsInfo += (k + 1) + ".  " + name + ", " + severity + "\n[" + description + "]" + "\n";
+              }
+            }
+            console.log(interactionsInfo)
+            client.messages.sendToUser(
+              botId,
+              "Below are the names of the interacting drugs, the level of interaction, and the type of interaction.\n\n" + interactionsInfo
+            )
+          })
       }
       else if(interResp == "no")
       {
@@ -202,23 +229,5 @@ function onSignedIn(session) {
     }
   })
 
-    const askInteraction = "What drug do you want to check for interactions with?"
-    client.messages.sendToUser(
-        botId,
-        askInteraction
-      ).then(function (message) {
-        console.log('sent', message.body, 'to', message.recipient.displayName)
-      })
-
-    // Loop RxNorm to collect list of drugs to check for interactions with.
-
-    const meds = ["207106", "152923"] // should be a variable array
-
-    const meds_list = meds.join("+") // join ids into string for request
-    console.log("https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=" + meds_list)
-    const request = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=" + meds_list
-    httplib.getRequestJson(request, (interactionsResp) => {
-        console.log(interactionsResp);
-    })
 
 }
