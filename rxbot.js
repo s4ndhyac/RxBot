@@ -85,7 +85,7 @@ function onSignedIn(session) {
                 }
 
                 suggestions += '\nPlease type in the command in the format "\\drug amoxicillin" again.';
-                
+
                 client.messages.sendToUser(
                   botId,
                   suggestions
@@ -103,14 +103,14 @@ function onSignedIn(session) {
               console.log(drugStrength)
               rxcuis = rxNormResp[2].RXCUIS;
               console.log(rxcuis)
-  
+
               var i = 0;
               var drugTypeMsg = "Variants available are:\n\n";
               for(i = 0; i< drugTypes.length; i++)
               {
                   drugTypeMsg += (i+1) + ".  " + drugTypes[i] + "\n";
               }
-  
+
               console.log(drugTypeMsg);
               client.messages.sendToUser(
                   botId,
@@ -208,7 +208,15 @@ function onSignedIn(session) {
               client.messages.sendToUser(
                 botId,
                 "No interactions found."
-              )
+              ).then(function (message) {
+
+                client.messages.sendToUser(
+                  botId,
+                  'If desired, enter the name of another drug you want information about, in the format "\\drug amoxicillin"'
+                ).then(function (message) {
+                  console.log('sent', message.body, 'to', message.recipient.displayName)
+                })
+              })
             } else {
             var interactionsList = interactionsResp.interactionTypeGroup[0].interactionType[0].interactionPair
             {
@@ -226,9 +234,17 @@ function onSignedIn(session) {
             client.messages.sendToUser(
               botId,
               "Below are the names of the interacting drugs and the type of interaction.\n\n" + interactionsInfo
-            )
+            ).then(function (message) {
+              client.messages.sendToUser(
+                botId,
+                'If desired, enter the name of another drug you want information about, in the format "\\drug amoxicillin"'
+              ).then(function (message) {
+                console.log('sent', message.body, 'to', message.recipient.displayName)
+              })
+            })
+
           }
-          })
+        })
       }
       else if(interResp == "no")
       {
@@ -251,6 +267,16 @@ function onSignedIn(session) {
       client.messages.sendToUser(
         botId,
         help
+      ).then(function (message) {
+        console.log('sent', message.body, 'to', message.recipient.displayName)
+      })
+    }
+    else
+    {
+      const error_msg = 'Sorry, I didn\'t understand that. To find drug information, enter the name of the drug in the format "\\drug amoxicillin"'
+      client.messages.sendToUser(
+        botId,
+        error_msg
       ).then(function (message) {
         console.log('sent', message.body, 'to', message.recipient.displayName)
       })
