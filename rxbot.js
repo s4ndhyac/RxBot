@@ -1,8 +1,8 @@
 var TigerConnect = require('tigerconnect')
+var httplib = require("./httpLib")
 
 var client = new TigerConnect.Client({
     baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
-    // baseUrl: 'https://developer.tigertext.me/v2',
     defaultOrganizationId: 'HP8FBxTpDl5AWanDFc3AY4Pe', // use the default org to send all messages in a specific organization unless specified otherwise
     events: {
       autoAck: false,
@@ -25,21 +25,40 @@ function onSignedIn(session) {
 
   client.messages.sendToUser(
     'cliang@tigerconnect.com',
-    'hello3!'
+    'Hello! I am the RxBot.'
   ).then(function (message) {
-    console.log('sent', message.body, 'to', message.recipient.displayName)
+    const disclaimer = "This product uses publicly available data from the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product.";
+    client.messages.sendToUser(
+      'cliang@tigerconnect.com',
+      disclaimer
+    ).then(function (message) {
+        client.messages.sendToUser(
+            'cliang@tigerconnect.com',
+            'Enter the name of drug you want information about.'
+          ).then(function (message) {
+            console.log('sent', message.body, 'to', message.recipient.displayName)
+          })
+    })
   })
 
   client.events.connect()
 
   client.on('message', function (message) {
-    console.log(
-      'message event',
-      message.sender.displayName,
-      'to',
-      message.recipient.displayName,
-      ':',
-      message.body
-    )
+    const drugName = message.body
+    console.log(drugName);
+    // Get RxNorm ID
+    httplib.getRequest("https://rxnav.nlm.nih.gov/REST/rxcui?name=" + drugName, (rxNormResp) => {
+        console.log(rxNormResp)
+        const rxcui = rxNormResp.rxnormdata.idGroup[0].rxnormId
+        console.log(rxcui)
+        
+        
+        
+        
+    });
+
+    
+
+
   })
 }
