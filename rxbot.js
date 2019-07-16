@@ -47,18 +47,30 @@ function onSignedIn(session) {
     const drugName = message.body
     console.log(drugName);
     // Get RxNorm ID
-    httplib.getRequest("https://rxnav.nlm.nih.gov/REST/rxcui?name=" + drugName, (rxNormResp) => {
+    httplib.getRequestJson("https://rxnav.nlm.nih.gov/REST/rxcui?name=" + drugName, (rxNormResp) => {
         console.log(rxNormResp)
         const rxcui = rxNormResp.rxnormdata.idGroup[0].rxnormId
         console.log(rxcui)
-        
-        
-        
-        
-    });
-
-    
-
-
+    })
   })
+
+    const askInteraction = "What drug do you want to check for interactions with?"
+    client.messages.sendToUser(
+        'cliang@tigerconnect.com',
+        askInteraction
+      ).then(function (message) {
+        console.log('sent', message.body, 'to', message.recipient.displayName)
+      })
+
+    // Loop RxNorm to collect list of drugs to check for interactions with.
+
+    const meds = ["207106", "152923"] // should be a variable array
+
+    const meds_list = meds.join("+") // join ids into string for request
+    console.log("https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=" + meds_list)
+    const request = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=" + meds_list
+    httplib.getRequestJson(request, (interactionsResp) => {
+        console.log(interactionsResp);
+    })
+
 }
