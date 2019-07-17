@@ -71,7 +71,7 @@ function onSignedIn(session) {
     var remMsg = ""
     var isWitAi = false
 
-    if(message[0] != '\\')
+    if(msgBody[0] != '\\')
     {
       witClient.message(msgBody, {})
       .then((data) => {
@@ -322,7 +322,7 @@ function onSignedIn(session) {
       command = msgBody.substr(0, splitIndex)
       remMsg = msgBody.substr(splitIndex + 1)
 
-      if(command == "\\drug" || (isWitAi && command=="drug"))
+      if(command == "\\drug")
     {
         drugName = remMsg
         console.log(drugName);
