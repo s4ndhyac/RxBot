@@ -7,7 +7,7 @@ const witClient = new Wit({
   accessToken: "HLN3VHJKAHUZRIOLGOJVN5G5URLX436I"
 });
 
-const botId = "cliang@tigerconnect.com";
+const botId = "jrecipient@tigerconnect.com";
 var client = new TigerConnect.Client({
     baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
     defaultOrganizationId: 'HP8FBxTpDl5AWanDFc3AY4Pe', // use the default org to send all messages in a specific organization unless specified otherwise
