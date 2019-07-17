@@ -4,6 +4,7 @@
   "description": "",
   "main": "rxbot.js",
   "dependencies": {
+    "node-wit": "^5.0.0",
     "tigerconnect": "^3.0.1",
     "xml2js": "^0.4.19"
   },
