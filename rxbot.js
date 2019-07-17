@@ -79,10 +79,12 @@ function onSignedIn(session) {
         console.log(data)
         entities = data.entities;
         console.log(entities);
+        var allKeys = Object.keys(entities)
         command = Object.keys(entities)[0]
         remMsg = entities[command][0].value
+        
         //TODO: Remove Hack from here
-        if(command == "moreInfo")
+        if(allKeys.indexOf("moreInfo") > -1)
         {
           command = "more"
           remMsg = entities["str"][0].value
@@ -230,7 +232,7 @@ function onSignedIn(session) {
     else if(command == "\\inter" || (isWitAi && command=="inter"))
     {
       var interResp = remMsg;
-      if(interResp == "yes")
+      if(interResp == "yes" || interResp == "any")
       {
         var interactionsInfo = ""
         var interactionsRequest = "https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh"
@@ -277,7 +279,7 @@ function onSignedIn(session) {
           }
         })
       }
-      else if(interResp == "no")
+      else if(interResp == "no" || interResp == "stop")
       {
         client.messages.sendToUser(
           botId,
