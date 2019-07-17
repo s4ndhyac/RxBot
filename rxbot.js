@@ -7,9 +7,7 @@ const witClient = new Wit({
   accessToken: "HLN3VHJKAHUZRIOLGOJVN5G5URLX436I"
 });
 
-
-
-const botId = "perscriptionbot@tigerconnect.com";
+const botId = "cliang@tigerconnect.com";
 var client = new TigerConnect.Client({
     baseUrl: 'https://env7-devapi.tigertext.xyz/v2',
     defaultOrganizationId: 'HP8FBxTpDl5AWanDFc3AY4Pe', // use the default org to send all messages in a specific organization unless specified otherwise
@@ -25,7 +23,7 @@ var client = new TigerConnect.Client({
     logLevel: 'error', // debug/info/warn/error/fatal
   })
 
-client.signIn('schandramohan@tigerconnect.com', 'Password!1', { udid: 'unique-device-id' }).then(function (session) {
+client.signIn('perscriptionbot@tigerconnect.com', 'Pass123!', { udid: 'unique-device-id' }).then(function (session) {
   onSignedIn(session)
 })
 
@@ -66,7 +64,7 @@ function onSignedIn(session) {
   var drugId = ""
 
   client.on('message', function (message) {
-    
+
     const msgBody = message.body;
     var splitIndex = ""
     var command = ""
@@ -90,7 +88,7 @@ function onSignedIn(session) {
           remMsg = entities["str"][0].value
         }
 
-        console.log(command)  
+        console.log(command)
         console.log(remMsg)
 
         //TODO: Note redundant code here, optimize later
@@ -314,7 +312,7 @@ function onSignedIn(session) {
         console.log('sent', message.body, 'to', message.recipient.displayName)
       })
     }
-        
+
       })
       .catch(console.error);
     }
@@ -548,7 +546,7 @@ function onSignedIn(session) {
 
     }
 
-    
+
   })
 
 
