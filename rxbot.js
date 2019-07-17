@@ -229,10 +229,10 @@ function onSignedIn(session) {
             })
         })
     }
-    else if(command == "\\inter" || (isWitAi && command=="inter"))
+    else if(command == "\\inter" || (isWitAi && command=="inter") || command == "interaction")
     {
       var interResp = remMsg;
-      if(interResp == "yes" || interResp == "any")
+      if(interResp == "yes" || interResp == "any" || interResp == "interaction" || interResp == "interactions")
       {
         var interactionsInfo = ""
         var interactionsRequest = "https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=" + rxcui + "&sources=ONCHigh"
